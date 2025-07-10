@@ -323,7 +323,7 @@ process.on('SIGTERM', async () => {
 });
 
 // Запускаем сервер только если файл запущен напрямую
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   main().catch((error) => {
     logError(error, 'Main');
     process.exit(1);

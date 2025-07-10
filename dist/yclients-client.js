@@ -1,11 +1,17 @@
-import axios from 'axios';
-import { handleYClientsError, logError } from './utils/errors';
-export class YClientsApiClient {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.YClientsApiClient = void 0;
+const axios_1 = __importDefault(require("axios"));
+const errors_1 = require("./utils/errors");
+class YClientsApiClient {
     client;
     config;
     constructor(config) {
         this.config = config;
-        this.client = axios.create({
+        this.client = axios_1.default.create({
             baseURL: config.baseUrl,
             headers: {
                 'Authorization': `Bearer ${config.bearerToken}`,
@@ -16,7 +22,7 @@ export class YClientsApiClient {
         });
         // Добавляем интерсептор для логирования ошибок
         this.client.interceptors.response.use((response) => response, (error) => {
-            logError(error, 'YClientsApiClient');
+            (0, errors_1.logError)(error, 'YClientsApiClient');
             return Promise.reject(error);
         });
     }
@@ -29,7 +35,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -41,7 +47,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -56,7 +62,7 @@ export class YClientsApiClient {
             return clients.length > 0 ? clients[0] : null;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -68,7 +74,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -84,7 +90,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -96,7 +102,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -108,7 +114,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -119,7 +125,7 @@ export class YClientsApiClient {
             await this.client.delete(`/company/${this.config.companyId}/records/${bookingId}`);
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -141,7 +147,7 @@ export class YClientsApiClient {
             return response.data.data;
         }
         catch (error) {
-            handleYClientsError(error);
+            (0, errors_1.handleYClientsError)(error);
         }
     }
     /**
@@ -159,4 +165,5 @@ export class YClientsApiClient {
         }
     }
 }
+exports.YClientsApiClient = YClientsApiClient;
 //# sourceMappingURL=yclients-client.js.map

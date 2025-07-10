@@ -1,7 +1,10 @@
-import { z } from 'zod';
-import { validateData, normalizePhone } from '../utils/validation';
-import { formatErrorForUser, logError } from '../utils/errors';
-export class ClientTools {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ClientTools = void 0;
+const zod_1 = require("zod");
+const validation_1 = require("../utils/validation");
+const errors_1 = require("../utils/errors");
+class ClientTools {
     apiClient;
     constructor(apiClient) {
         this.apiClient = apiClient;
@@ -30,11 +33,11 @@ export class ClientTools {
      */
     async handleFindClient(args) {
         try {
-            const schema = z.object({
-                phone: z.string(),
+            const schema = zod_1.z.object({
+                phone: zod_1.z.string(),
             });
-            const request = validateData(schema, args);
-            const normalizedPhone = normalizePhone(request.phone);
+            const request = (0, validation_1.validateData)(schema, args);
+            const normalizedPhone = (0, validation_1.normalizePhone)(request.phone);
             const client = await this.apiClient.findClientByPhone(normalizedPhone);
             if (!client) {
                 return `❌ Клиент с телефоном ${normalizedPhone} не найден`;
@@ -47,8 +50,8 @@ export class ClientTools {
 ${client.comment ? `• Комментарий: ${client.comment}` : ''}`;
         }
         catch (error) {
-            logError(error, 'FindClient');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'FindClient');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
     /**
@@ -85,13 +88,13 @@ ${client.comment ? `• Комментарий: ${client.comment}` : ''}`;
      */
     async handleGetClientBookings(args) {
         try {
-            const schema = z.object({
-                phone: z.string(),
-                date_from: z.string().optional(),
-                date_to: z.string().optional(),
+            const schema = zod_1.z.object({
+                phone: zod_1.z.string(),
+                date_from: zod_1.z.string().optional(),
+                date_to: zod_1.z.string().optional(),
             });
-            const request = validateData(schema, args);
-            const normalizedPhone = normalizePhone(request.phone);
+            const request = (0, validation_1.validateData)(schema, args);
+            const normalizedPhone = (0, validation_1.normalizePhone)(request.phone);
             // Сначала найдем клиента
             const client = await this.apiClient.findClientByPhone(normalizedPhone);
             if (!client) {
@@ -129,8 +132,8 @@ ${client.comment ? `• Комментарий: ${client.comment}` : ''}`;
             return result;
         }
         catch (error) {
-            logError(error, 'GetClientBookings');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'GetClientBookings');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
     /**
@@ -157,10 +160,10 @@ ${client.comment ? `• Комментарий: ${client.comment}` : ''}`;
      */
     async handleCancelBooking(args) {
         try {
-            const schema = z.object({
-                booking_id: z.number(),
+            const schema = zod_1.z.object({
+                booking_id: zod_1.z.number(),
             });
-            const request = validateData(schema, args);
+            const request = (0, validation_1.validateData)(schema, args);
             // Сначала получим информацию о записи
             const booking = await this.apiClient.getBooking(request.booking_id);
             // Отменим запись
@@ -180,9 +183,10 @@ ${client.comment ? `• Комментарий: ${client.comment}` : ''}`;
 • ID записи: ${booking.id}`;
         }
         catch (error) {
-            logError(error, 'CancelBooking');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'CancelBooking');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
 }
+exports.ClientTools = ClientTools;
 //# sourceMappingURL=clients.js.map

@@ -1,5 +1,8 @@
-import { formatErrorForUser, logError } from '../utils/errors';
-export class ServiceTools {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ServiceTools = void 0;
+const errors_1 = require("../utils/errors");
+class ServiceTools {
     apiClient;
     constructor(apiClient) {
         this.apiClient = apiClient;
@@ -56,8 +59,8 @@ export class ServiceTools {
             return result;
         }
         catch (error) {
-            logError(error, 'GetServicesList');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'GetServicesList');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
     /**
@@ -103,9 +106,10 @@ export class ServiceTools {
             return result;
         }
         catch (error) {
-            logError(error, 'GetStaffList');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'GetStaffList');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
 }
+exports.ServiceTools = ServiceTools;
 //# sourceMappingURL=services.js.map

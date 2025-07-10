@@ -1,7 +1,10 @@
-import { BookAppointmentSchema, FindAvailableTimeSchema, } from '../types';
-import { validateData, normalizePhone, validateFutureDate, formatDateTimeForYClients, findServiceByName, findStaffByName, } from '../utils/validation';
-import { formatErrorForUser, logError } from '../utils/errors';
-export class BookingTools {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BookingTools = void 0;
+const types_1 = require("../types");
+const validation_1 = require("../utils/validation");
+const errors_1 = require("../utils/errors");
+class BookingTools {
     apiClient;
     constructor(apiClient) {
         this.apiClient = apiClient;
@@ -56,12 +59,12 @@ export class BookingTools {
     async handleBookAppointment(args) {
         try {
             // Валидация входных данных
-            const request = validateData(BookAppointmentSchema, args);
+            const request = (0, validation_1.validateData)(types_1.BookAppointmentSchema, args);
             // Нормализация телефона
-            const normalizedPhone = normalizePhone(request.client_phone);
+            const normalizedPhone = (0, validation_1.normalizePhone)(request.client_phone);
             // Проверка даты
-            if (!validateFutureDate(request.preferred_date)) {
-                return formatErrorForUser(new Error('Дата должна быть не ранее сегодня'));
+            if (!(0, validation_1.validateFutureDate)(request.preferred_date)) {
+                return (0, errors_1.formatErrorForUser)(new Error('Дата должна быть не ранее сегодня'));
             }
             // 1. Поиск или создание клиента
             let client = await this.apiClient.findClientByPhone(normalizedPhone);
@@ -75,7 +78,7 @@ export class BookingTools {
             // 2. Поиск услуги по названию
             const services = await this.apiClient.getServices();
             const activeServices = services.filter(s => s.active === 1);
-            const foundServices = findServiceByName(activeServices, request.service_name);
+            const foundServices = (0, validation_1.findServiceByName)(activeServices, request.service_name);
             if (foundServices.length === 0) {
                 return `❌ Услуга "${request.service_name}" не найдена. Доступные услуги: ${activeServices.map(s => s.title).join(', ')}`;
             }
@@ -87,7 +90,7 @@ export class BookingTools {
             let selectedStaff = null;
             const allStaff = await this.apiClient.getStaff();
             if (request.master_name) {
-                const foundStaff = findStaffByName(allStaff, request.master_name);
+                const foundStaff = (0, validation_1.findStaffByName)(allStaff, request.master_name);
                 if (foundStaff.length === 0) {
                     return `❌ Мастер "${request.master_name}" не найден. Доступные мастера: ${allStaff.map(s => s.name).join(', ')}`;
                 }
@@ -105,7 +108,7 @@ export class BookingTools {
                 selectedStaff = availableStaff[0]; // Берем первого доступного
             }
             // 4. Проверка доступности времени
-            const datetime = formatDateTimeForYClients(request.preferred_date, request.preferred_time);
+            const datetime = (0, validation_1.formatDateTimeForYClients)(request.preferred_date, request.preferred_time);
             const isAvailable = await this.apiClient.checkTimeAvailability(selectedStaff.id, service.id, datetime);
             if (!isAvailable) {
                 // Предлагаем альтернативное время
@@ -154,8 +157,8 @@ export class BookingTools {
 ${request.comment ? `• Комментарий: ${request.comment}` : ''}`;
         }
         catch (error) {
-            logError(error, 'BookAppointment');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'BookAppointment');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
     /**
@@ -196,11 +199,11 @@ ${request.comment ? `• Комментарий: ${request.comment}` : ''}`;
      */
     async handleFindAvailableTime(args) {
         try {
-            const request = validateData(FindAvailableTimeSchema, args);
+            const request = (0, validation_1.validateData)(types_1.FindAvailableTimeSchema, args);
             // Поиск услуги
             const services = await this.apiClient.getServices();
             const activeServices = services.filter(s => s.active === 1);
-            const foundServices = findServiceByName(activeServices, request.service_name);
+            const foundServices = (0, validation_1.findServiceByName)(activeServices, request.service_name);
             if (foundServices.length === 0) {
                 return `❌ Услуга "${request.service_name}" не найдена`;
             }
@@ -209,7 +212,7 @@ ${request.comment ? `• Комментарий: ${request.comment}` : ''}`;
             const allStaff = await this.apiClient.getStaff();
             let targetStaff = allStaff;
             if (request.master_name) {
-                const foundStaff = findStaffByName(allStaff, request.master_name);
+                const foundStaff = (0, validation_1.findStaffByName)(allStaff, request.master_name);
                 if (foundStaff.length === 0) {
                     return `❌ Мастер "${request.master_name}" не найден`;
                 }
@@ -273,9 +276,10 @@ ${request.comment ? `• Комментарий: ${request.comment}` : ''}`;
             return result;
         }
         catch (error) {
-            logError(error, 'FindAvailableTime');
-            return formatErrorForUser(error);
+            (0, errors_1.logError)(error, 'FindAvailableTime');
+            return (0, errors_1.formatErrorForUser)(error);
         }
     }
 }
+exports.BookingTools = BookingTools;
 //# sourceMappingURL=booking.js.map

@@ -1,18 +1,23 @@
 #!/usr/bin/env node
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { YClientsApiClient } from './yclients-client.js';
-import { BookingTools } from './tools/booking.js';
-import { ClientTools } from './tools/clients.js';
-import { ServiceTools } from './tools/services.js';
-import { logError } from './utils/errors.js';
-import dotenv from 'dotenv';
-import express from 'express';
-import cors from 'cors';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
+const stdio_js_1 = require("@modelcontextprotocol/sdk/server/stdio.js");
+const sse_js_1 = require("@modelcontextprotocol/sdk/server/sse.js");
+const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
+const yclients_client_js_1 = require("./yclients-client.js");
+const booking_js_1 = require("./tools/booking.js");
+const clients_js_1 = require("./tools/clients.js");
+const services_js_1 = require("./tools/services.js");
+const errors_js_1 = require("./utils/errors.js");
+const dotenv_1 = __importDefault(require("dotenv"));
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 // Загружаем переменные окружения
-dotenv.config();
+dotenv_1.default.config();
 // Конфигурация
 const config = {
     baseUrl: process.env.YCLIENTS_BASE_URL || 'https://api.yclients.com/api/v1',
@@ -33,12 +38,12 @@ if (!config.companyId) {
     process.exit(1);
 }
 // Создаем клиент API и инструменты
-const apiClient = new YClientsApiClient(config);
-const bookingTools = new BookingTools(apiClient);
-const clientTools = new ClientTools(apiClient);
-const serviceTools = new ServiceTools(apiClient);
+const apiClient = new yclients_client_js_1.YClientsApiClient(config);
+const bookingTools = new booking_js_1.BookingTools(apiClient);
+const clientTools = new clients_js_1.ClientTools(apiClient);
+const serviceTools = new services_js_1.ServiceTools(apiClient);
 // Создаем MCP сервер
-const server = new Server({
+const server = new index_js_1.Server({
     name: process.env.MCP_SERVER_NAME || 'yclients-booking',
     version: process.env.MCP_SERVER_VERSION || '1.0.0',
 }, {
@@ -50,7 +55,7 @@ const server = new Server({
 /**
  * Обработчик получения списка инструментов
  */
-server.setRequestHandler(ListToolsRequestSchema, async () => {
+server.setRequestHandler(types_js_1.ListToolsRequestSchema, async () => {
     return {
         tools: [
             // Инструменты записи
@@ -69,7 +74,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 /**
  * Обработчик вызова инструментов
  */
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
+server.setRequestHandler(types_js_1.CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
     try {
         switch (name) {
@@ -144,7 +149,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
     }
     catch (error) {
-        logError(error, `CallTool:${name}`);
+        (0, errors_js_1.logError)(error, `CallTool:${name}`);
         return {
             content: [
                 {
@@ -160,14 +165,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
  * Обработчик ошибок сервера
  */
 server.onerror = (error) => {
-    logError(error, 'MCPServer');
+    (0, errors_js_1.logError)(error, 'MCPServer');
 };
 /**
  * Запуск SSE сервера для n8n MCP Client
  */
 async function startSSEServer(mcpServer, port) {
-    const app = express();
-    app.use(cors({
+    const app = (0, express_1.default)();
+    app.use((0, cors_1.default)({
         origin: '*',
         methods: ['GET', 'POST', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'],
@@ -203,7 +208,7 @@ async function startSSEServer(mcpServer, port) {
     app.get('/sse', async (req, res) => {
         console.error('📡 Новое SSE подключение');
         // Создаем SSE транспорт для этого подключения
-        const transport = new SSEServerTransport('/messages', res);
+        const transport = new sse_js_1.SSEServerTransport('/messages', res);
         // Сохраняем транспорт
         if (transport.sessionId) {
             transports[transport.sessionId] = transport;
@@ -219,7 +224,7 @@ async function startSSEServer(mcpServer, port) {
         await mcpServer.connect(transport);
     });
     // Messages endpoint для обработки POST запросов от клиентов
-    app.post('/messages', express.json(), async (req, res) => {
+    app.post('/messages', express_1.default.json(), async (req, res) => {
         try {
             const sessionId = req.query.sessionId;
             console.error(`📨 Получено сообщение для сессии: ${sessionId}`);
@@ -261,13 +266,13 @@ async function main() {
         }
         else {
             console.error(`📡 Запуск STDIO транспорта`);
-            const transport = new StdioServerTransport();
+            const transport = new stdio_js_1.StdioServerTransport();
             await server.connect(transport);
             console.error('✅ MCP сервер успешно запущен');
         }
     }
     catch (error) {
-        logError(error, 'MCPServerStartup');
+        (0, errors_js_1.logError)(error, 'MCPServerStartup');
         console.error('❌ Ошибка запуска MCP сервера:', error);
         process.exit(1);
     }
@@ -284,9 +289,9 @@ process.on('SIGTERM', async () => {
     process.exit(0);
 });
 // Запускаем сервер только если файл запущен напрямую
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
     main().catch((error) => {
-        logError(error, 'Main');
+        (0, errors_js_1.logError)(error, 'Main');
         process.exit(1);
     });
 }
