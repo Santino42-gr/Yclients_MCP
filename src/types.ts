@@ -121,7 +121,8 @@ export type FindAvailableTimeRequest = z.infer<typeof FindAvailableTimeSchema>;
 // Конфигурация
 export interface YClientsConfig {
   baseUrl: string;
-  bearerToken: string;
+  partnerToken: string;  // Bearer token (Partner API)
+  userToken: string;     // User token
   companyId: number;
   rateLimitPerMinute?: number;
 }

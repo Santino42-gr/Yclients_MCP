@@ -20,7 +20,8 @@ dotenv.config();
 // Конфигурация
 const config: YClientsConfig = {
   baseUrl: process.env.YCLIENTS_BASE_URL || 'https://api.yclients.com/api/v1',
-  bearerToken: process.env.YCLIENTS_BEARER_TOKEN || '',
+  partnerToken: process.env.YCLIENTS_PARTNER_TOKEN || '',
+  userToken: process.env.YCLIENTS_USER_TOKEN || '',
   companyId: parseInt(process.env.YCLIENTS_COMPANY_ID || '0'),
   rateLimitPerMinute: parseInt(process.env.RATE_LIMIT_REQUESTS_PER_MINUTE || '60'),
 };
@@ -30,8 +31,13 @@ const TRANSPORT = process.env.MCP_TRANSPORT || 'stdio';
 const PORT = parseInt(process.env.PORT || process.env.MCP_PORT || '3000');
 
 // Проверяем обязательные переменные
-if (!config.bearerToken) {
-  console.error('❌ Ошибка: YCLIENTS_BEARER_TOKEN не установлен');
+if (!config.partnerToken) {
+  console.error('❌ Ошибка: YCLIENTS_PARTNER_TOKEN не установлен');
+  process.exit(1);
+}
+
+if (!config.userToken) {
+  console.error('❌ Ошибка: YCLIENTS_USER_TOKEN не установлен');
   process.exit(1);
 }
 

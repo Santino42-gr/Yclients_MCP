@@ -287,7 +287,8 @@ export declare const FindAvailableTimeSchema: z.ZodObject<{
 export type FindAvailableTimeRequest = z.infer<typeof FindAvailableTimeSchema>;
 export interface YClientsConfig {
     baseUrl: string;
-    bearerToken: string;
+    partnerToken: string;
+    userToken: string;
     companyId: number;
     rateLimitPerMinute?: number;
 }

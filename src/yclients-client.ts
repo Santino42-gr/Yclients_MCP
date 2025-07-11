@@ -19,7 +19,7 @@ export class YClientsApiClient {
     this.client = axios.create({
       baseURL: config.baseUrl,
       headers: {
-        'Authorization': `Bearer ${config.bearerToken}`,
+        'Authorization': `Bearer ${config.partnerToken}, User ${config.userToken}`,
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.yclients.v2+json',
       },
