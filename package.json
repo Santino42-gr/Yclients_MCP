@@ -2,7 +2,6 @@
   "name": "yclients-mcp-server",
   "version": "1.0.0",
   "description": "MCP сервер для автоматизации записи клиентов в салон красоты через YClients API",
-  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
